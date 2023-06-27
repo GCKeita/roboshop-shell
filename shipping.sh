@@ -31,7 +31,7 @@ cp /root/roboshop-shell/shipping.service /etc/systemd/system/shipping.service &>
 echo -e "\e[33m Starting the Shipping Service \e[0m"
 systemctl daemon-reload &>>/tmp/roboshop.log
 systemctl enable shipping &>>/tmp/roboshop.log
-systemctl start shipping &>>/tmp/roboshop.log
+systemctl restart shipping &>>/tmp/roboshop.log
 
 
 
