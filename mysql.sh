@@ -1,6 +1,9 @@
 echo -e "\e[33m Disabling MySQL Default version \e[0m"
 yum module disable mysql -y &>>/tmp/roboshop.log
 
+echo -e "\e[33m Copying MySQL Repo File \e[0m"
+cp /root/roboshop-shell/roboshop-shell/mysql.repo /etc/yum.repos.d/mysql.repo &>>/tmp/roboshop.log
+
 echo -e "\e[33m Installing MySQL Community Server \e[0m"
 yum install mysql-community-server -y &>>/tmp/roboshop.log
 
