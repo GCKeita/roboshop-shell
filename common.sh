@@ -37,7 +37,7 @@ nodejs() {
     systemctl restart $component &>>$log_file
 }
 
-mongo_schema_setup
+mongo_schema_setup() {
     echo -e "${color} Copying MongoDB Repo file ${nocolor}"
     cp /root/roboshop-shell/mongodb.repo /etc/yum.repos.d/mongodb.repo &>>$log_file
 
@@ -46,3 +46,4 @@ mongo_schema_setup
 
     echo -e "${color} Loading Schema ${nocolor}"
     mongo --host Mmongodb-dev.gckeita-devops.com ${app_path}/schema/$component.js &>>$log_file
+}
