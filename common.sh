@@ -2,15 +2,8 @@ color="\e[35m"
 nocolor="\e[0m"
 log_file=/tmp/roboshop.log
 app_path="/app"
-
-nodejs() {
-    echo -e "${color} Configuring NodeJS Repo ${nocolor}"
-    curl -sL https://rpm.nodesource.com/setup_lts.x | bash &>>$log_file
-
-    echo -e "${color} Installing NodeJS ${nocolor}"
-    yum install nodejs -y &>>$log_file
-
-    echo -e "${color}Adding application User ${nocolor}"
+app_presetup() {
+    echo -e "${color} Adding application User ${nocolor}"
     useradd roboshop &>>$log_file
 
     echo -e "${color} Creating Application Directory ${nocolor}"
@@ -19,15 +12,13 @@ nodejs() {
 
     echo -e "${color} Downloading Application content ${nocolor}"
     curl -o /tmp/$component.zip https://roboshop-artifacts.s3.amazonaws.com/$component.zip &>>$log_file
-    cd ${app_path}
-    unzip /tmp/$component.zip &>>$log_file
 
     echo -e "${color} Extracting Application Content ${nocolor}"
     cd ${app_path}
+    unzip /tmp/$component.zip &>>$log_file
+}
 
-    echo -e "${color} Installing NodeJS Dependencies ${nocolor}"
-    npm install &>>$log_file
-
+systemd_setup() {
     echo -e "${color} Setup SystemD Service ${nocolor}"
     cp /root/roboshop-shell/$component.service /etc/systemd/system/$component.service &>>$log_file
 
@@ -35,6 +26,29 @@ nodejs() {
     systemctl daemon-reload &>>$log_file
     systemctl enable $component &>>$log_file
     systemctl restart $component &>>$log_file
+}
+
+mysql_schema_setup() {
+    echo -e "${color} Installing MySQL Client ${nocolor}"
+    yum install mysql -y  &>>$log_file
+
+    echo -e "${color} Loading the schema ${nocolor}"
+    mysql -h mysql-dev.gckeita-devops.com -uroot -pRoboShop@1 < /app/schema/$component.sql &>>$log_file
+}
+
+nodejs() {
+    echo -e "${color} Configuring NodeJS Repo ${nocolor}"
+    curl -sL https://rpm.nodesource.com/setup_lts.x | bash &>>$log_file
+
+    echo -e "${color} Installing NodeJS ${nocolor}"
+    yum install nodejs -y &>>$log_file
+
+    app_presetup
+
+    echo -e "${color} Installing NodeJS Dependencies ${nocolor}"
+    npm install &>>$log_file
+
+    systemd_setup
 }
 
 mongo_schema_setup() {
@@ -45,5 +59,21 @@ mongo_schema_setup() {
     yum install mongodb-org-shell -y &>>$log_file
 
     echo -e "${color} Loading Schema ${nocolor}"
-    mongo --host Mmongodb-dev.gckeita-devops.com ${app_path}/schema/$component.js &>>$log_file
+    mongo --host mongodb-dev.gckeita-devops.com ${app_path}/schema/$component.js &>>$log_file
+}
+
+maven() {
+    echo -e "${color} Installing Maven ${nocolor}"
+    yum install maven -y &>>$log_file
+
+    app_presetup
+
+    echo -e "${color} Downloading the Application Dependencies ${nocolor}"
+    mvn clean package &>>$log_file
+    mv target/$component-1.0.jar $component.jar &>>$log_file
+
+    mysql_schema_setup
+
+    systemd_setup
+
 }
