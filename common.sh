@@ -94,6 +94,7 @@ python() {
   echo -e "${color} downloading Application Dependencies ${nocolor}"
   cd ${app_path}
   pip3.6 install -r requirements.txt &>>/tmp/roboshop.log
+  echo $?
 
  systemd_setup
 }
