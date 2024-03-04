@@ -15,4 +15,3 @@ echo -e "\e[33m Setup Password \e[0m"
 mysql_secure_installation --set-root-pass RoboShop@1 &>>/tmp/roboshop.log
 
 
-
