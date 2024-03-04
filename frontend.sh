@@ -18,4 +18,3 @@ echo -e "${color} Starting Nginx Server ${nocolor}"
 systemctl enable nginx &>>/tmp/roboshop.log
 systemctl restart nginx &>>/tmp/roboshop.log
 
-
