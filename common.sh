@@ -99,8 +99,8 @@ python() {
  systemd_setup
 }
 
-Goland() {
-  echo -e "${color} Installing GoLand ${nocolor}"
+Golang() {
+  echo -e "${color} Installing Golang ${nocolor}"
   dnf install golang -y &>>/tmp/roboshop.log
   echo $?
 
