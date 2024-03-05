@@ -99,7 +99,7 @@ python() {
  systemd_setup
 }
 
-Golang() {
+golang() {
   echo -e "${color} Installing Golang ${nocolor}"
   yum install golang -y &>>/tmp/roboshop.log
   echo $?
