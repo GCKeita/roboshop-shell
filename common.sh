@@ -101,7 +101,7 @@ python() {
 
 Golang() {
   echo -e "${color} Installing Golang ${nocolor}"
-  dnf install golang -y &>>/tmp/roboshop.log
+  yum install golang -y &>>/tmp/roboshop.log
   echo $?
 
   app_presetup
