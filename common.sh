@@ -98,3 +98,20 @@ python() {
 
  systemd_setup
 }
+
+Goland() {
+  echo -e "${color} Installing GoLand ${nocolor}"
+  dnf install golang -y &>>/tmp/roboshop.log
+  echo $?
+
+  app_presetup
+
+  echo -e "${color} downloading Application Dependencies ${nocolor}"
+  cd ${app_path}
+  go mod init dispatch &>>/tmp/roboshop.log
+  go get &>>/tmp/roboshop.log
+  go build &>>/tmp/roboshop.log
+  echo $?
+
+ systemd_setup
+}
