@@ -2,36 +2,48 @@ color="\e[35m"
 nocolor="\e[0m"
 log_file=/tmp/roboshop.log
 app_path="/app"
+
+stat_check() {
+  if [ $1 -eq 0 ]; then
+    echo SUCCESS
+  else
+    echo FAILURE
+  fi
+}
+
 app_presetup() {
     echo -e "${color} Adding application User ${nocolor}"
-    useradd roboshop &>>$log_file
-    echo $?
+    id roboshop &>>$log_file
+    if [$? -eq 1 ]; then
+      useradd roboshop &>>$log_file
+    fi
+    stat_check $?
 
     echo -e "${color} Creating Application Directory ${nocolor}"
     rm -rf ${app_path} &>>$log_file
     mkdir ${app_path}
-    echo  $?
+    stat_check $?
 
     echo -e "${color} Downloading Application content ${nocolor}"
     curl -o /tmp/$component.zip https://roboshop-artifacts.s3.amazonaws.com/$component.zip &>>$log_file
-    echo $?
+    stat_check $?
 
     echo -e "${color} Extracting Application Content ${nocolor}"
     cd ${app_path}
     unzip /tmp/$component.zip &>>$log_file
-    echo $?
+    stat_check $?
 }
 
 systemd_setup() {
     echo -e "${color} Setup SystemD Service ${nocolor}"
     cp /root/roboshop-shell/$component.service /etc/systemd/system/$component.service &>>$log_file
-    echo $?
+    stat_check $?
 
     echo -e "${color} Starting $Component service ${nocolor}"
     systemctl daemon-reload &>>$log_file
     systemctl enable $component &>>$log_file
     systemctl restart $component &>>$log_file
-    echo $?
+    stat_check $?
 }
 
 nodejs() {
@@ -87,14 +99,14 @@ maven() {
 python() {
   echo -e "${color} Installing Python 3.6 ${nocolor}"
   yum install python36 gcc python3-devel -y &>>/tmp/roboshop.log
-  echo $?
+  stat_check $?
 
   app_presetup
 
   echo -e "${color} downloading Application Dependencies ${nocolor}"
   cd ${app_path}
   pip3.6 install -r requirements.txt &>>/tmp/roboshop.log
-  echo $?
+  stat_check $?
 
  systemd_setup
 }
@@ -102,7 +114,7 @@ python() {
 golang() {
   echo -e "${color} Installing Golang ${nocolor}"
   yum install golang -y &>>/tmp/roboshop.log
-  echo $?
+  stat_check $?
 
   app_presetup
 
@@ -111,7 +123,7 @@ golang() {
   go mod init dispatch &>>/tmp/roboshop.log
   go get &>>/tmp/roboshop.log
   go build &>>/tmp/roboshop.log
-  echo $?
+  stat_check $?
 
  systemd_setup
 }
