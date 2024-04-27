@@ -125,6 +125,8 @@ golang() {
   go build &>>/tmp/roboshop.log
   stat_check $?
 
+  sed -i -e "s/roboshop_app_password/$1/" /root/roboshop-shell/$component.service
+
  systemd_setup
 }
 
