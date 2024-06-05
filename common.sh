@@ -8,7 +8,6 @@ if [ $user_id -ne 0]; then
   exit 1
 fi
 
-
 stat_check() {
   if [ $1 -eq 0 ]; then
     echo SUCCESS
@@ -44,6 +43,7 @@ app_presetup() {
 systemd_setup() {
     echo -e "${color} Setup SystemD Service ${nocolor}"
     cp /root/roboshop-shell/$component.service /etc/systemd/system/$component.service &>>$log_file
+    sed -i -e "s/roboshop_app_password/$roboshop_app_password/"  /etc/systemd/system/$component.service
     stat_check $?
 
     echo -e "${color} Starting $Component service ${nocolor}"
@@ -56,14 +56,17 @@ systemd_setup() {
 nodejs() {
     echo -e "${color} Configuring NodeJS Repo ${nocolor}"
     curl -sL https://rpm.nodesource.com/setup_lts.x | bash &>>$log_file
+    stat_check $?
 
     echo -e "${color} Installing NodeJS ${nocolor}"
     yum install nodejs -y &>>$log_file
+    stat_check $?
 
     app_presetup
 
     echo -e "${color} Installing NodeJS Dependencies ${nocolor}"
     npm install &>>$log_file
+    stat_check $?
 
     systemd_setup
 }
@@ -71,31 +74,38 @@ nodejs() {
 mongo_schema_setup() {
     echo -e "${color} Copying MongoDB Repo file ${nocolor}"
     cp /root/roboshop-shell/mongodb.repo /etc/yum.repos.d/mongodb.repo &>>$log_file
+    stat_check $?
 
     echo -e "${color} Installing MongoDB Client ${nocolor}"
     yum install mongodb-org-shell -y &>>$log_file
+    stat_check $?
 
     echo -e "${color} Loading Schema ${nocolor}"
     mongo --host mongodb-dev.gckeita-devops.com ${app_path}/schema/$component.js &>>$log_file
+    stat_check $?
 }
 
 mysql_schema_setup() {
     echo -e "${color} Installing MySQL Client ${nocolor}"
     yum install mysql -y  &>>$log_file
+    stat_check $?
 
     echo -e "${color} Loading the schema ${nocolor}"
     mysql -h mysql-dev.gckeita-devops.com -uroot -pRoboShop@1 < /app/schema/$component.sql &>>$log_file
+    stat_check $?
 }
 
 maven() {
     echo -e "${color} Installing Maven ${nocolor}"
     yum install maven -y &>>$log_file
+    stat_check $?
 
     app_presetup
 
     echo -e "${color} Downloading the Application Dependencies ${nocolor}"
     mvn clean package &>>$log_file
     mv target/$component-1.0.jar $component.jar &>>$log_file
+    stat_check $?
 
     mysql_schema_setup
 
