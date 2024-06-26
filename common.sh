@@ -3,7 +3,7 @@ nocolor="\e[0m"
 log_file=/tmp/roboshop.log
 app_path="/app"
 user_id=$(id -u)
-if [ $user_id -ne 0]; then
+if [ $user_id -ne 0 ]; then
   echo Script should be running with sudo
   exit 1
 fi
