@@ -13,7 +13,7 @@ yum install redis -y &>>/tmp/roboshop.log
 stat_check $?
 
 echo -e "\${color}Updating Redis Listen Address${nocolor}"
-sed -i -e 's/127.0.0.1/0.0.0.0' /etc/redis.conf /etc/redis/redis.conf &>>/tmp/roboshop.log
+sed -i -e 's/127.0.0.1/0.0.0.0/' /etc/redis.conf /etc/redis/redis.conf &>>/tmp/roboshop.log
 stat_check $?
 
 echo -e "\${color}Starting Nginx Service${nocolor}"
