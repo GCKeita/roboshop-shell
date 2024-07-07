@@ -1,5 +1,6 @@
 [Unit]
 Description = Dispatch Service
+
 [Service]
 User=roboshop
 Environment=AMQP_HOST=rabbitmq-dev.gckeita-devops.com
